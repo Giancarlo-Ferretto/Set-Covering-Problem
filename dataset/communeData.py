@@ -42,5 +42,3 @@ communeData = [
     Commune(37, "Villa Alemana", 2.5),
     Commune(38, "Viña del Mar", 1.5)
 ]
-
-print(communeData[37])
