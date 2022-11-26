@@ -1,6 +1,7 @@
 import networkx as nx
 from dataset.regionGraph import regionGraph
 
+# dibuja el grafo en regionGraph.png
 import matplotlib 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
