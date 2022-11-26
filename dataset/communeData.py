@@ -1,0 +1,46 @@
+from models.commune import Commune
+
+#dataset proporcionado en Tarea2-Enunciado.pdf
+communeData = [
+    Commune("null", 0),
+    Commune("null", 0),
+    Commune("Calle Larga", 1),
+    Commune("San Esteban", 1.5),
+    Commune("Rinconada", 1.2 ),
+    Commune("Los Andes", 2),
+    Commune("Cabildo", 3),
+    Commune("La Ligua", 2),
+    Commune("Papudo", 1),
+    Commune("Petorca", 1),
+    Commune("Zapallar", 3),
+    Commune("Hijuelas", 4),
+    Commune("La Calera", 3),
+    Commune("La Cruz", 3),
+    Commune("Limache", 2),
+    Commune("Nogales", 2.5),
+    Commune("Olmúe", 1.5),
+    Commune("Quillota", 2),
+    Commune("Algarrobo", 2),
+    Commune("Cartagena", 3),
+    Commune("El Quisco", 2),
+    Commune("El Tabo", 2),
+    Commune("San Antonio", 3),
+    Commune("Santo Domingo", 2),
+    Commune("Catemu", 3),
+    Commune("Llay-Llay", 3),
+    Commune("Panquehue", 1),
+    Commune("Putaendo", 2.5),
+    Commune("San Felipe", 2),
+    Commune("Santa María", 3.5),
+    Commune("Quilpúe", 2),
+    Commune("Concón", 1.5),
+    Commune("null", 0),
+    Commune("Puchuncaví", 2),
+    Commune("Casablanca", 3),
+    Commune("Quintero", 3.5),
+    Commune("Valparaíso", 2),
+    Commune("Villa Alemana", 2.5),
+    Commune("Viña del Mar", 1.5)
+]
+
+print(communeData[37])
