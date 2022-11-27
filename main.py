@@ -13,7 +13,7 @@ nx.draw(regionGraph, ax=graphFigure.add_subplot(111), with_labels=True)
 graphFigure.savefig("regionGraph.png")
 
 # communesdataset
-binaryMatrix = graphToMatrix(regionGraph)
+regionArray = graphToMatrix(regionGraph)
 
 # costs of communes
 costs = [1, 1.5, 1.2, 2, 3, 2, 1, 1, 3, 4, 3, 3, 2, 2.5, 1.5, 2, 2, 3, 2, 2, 3, 2, 3, 3, 1, 2.5, 2, 3.5, 2, 1.5, 2, 3, 3.5, 2, 2.5, 1.5]
@@ -24,7 +24,7 @@ def isCommuneIlluminated(commune, solution):
         return True
     else:
         for neighbor in range(len(solution)):
-            if binaryMatrix[commune, neighbor] == 1 and solution[neighbor] == 1:
+            if regionArray[commune, neighbor] == 1 and solution[neighbor] == 1:
                 return True
     return False
 
@@ -43,53 +43,80 @@ def calculateSolutionCost(solution):
             cost += costs[i]
     return cost
 
-# first solution vector
-firstSolution = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-
-# generate a random illuminated region solution
-def generateRandomIlluminatedRegionSolution():
-    solution = [0] * len(binaryMatrix)
+# generate a random solution
+def generateRandomSolution():
+    solution = [0] * len(regionArray)
     while isRegionIlluminated(solution) == False:
         solution[random.randint(0, len(solution)-1)] = 1
     return solution
 
+#swap mutation
+def swapMutation(solution, mutations=1):
+    for i in range(mutations):
+        index = random.randint(0, len(solution)-1)
+        if solution[index] == 1:
+            solution[index] = 0
+        else:
+            solution[index] = 1
+    if isRegionIlluminated(solution) == False: return swapMutation(solution, mutations+1)
+    return solution
+
+# first solution
+print(">>> Random solution:")
+firstSolution = generateRandomSolution()
 print("First solution: ", firstSolution)
 print("Cost of first solution: ", calculateSolutionCost(firstSolution))
-print("Is first solution illuminated? ", isRegionIlluminated(firstSolution))
-print("Is first commune of first solution illuminated? ", isCommuneIlluminated(0, firstSolution))
-print(" ")
+print("Is first solution region illuminated? ", isRegionIlluminated(firstSolution))
+print("[test] Is first commune of first solution illuminated? ", isCommuneIlluminated(0, firstSolution))
+print("[test] Is second commune of first solution illuminated? ", isCommuneIlluminated(1, firstSolution))
 print(" ")
 
 # simulated annealing algorithm
-def simulatedAnnealing(solution):
-    currentSolution = solution
-    currentCost = calculateSolutionCost(currentSolution)
+def simulatedAnnealing(initialSolution):
+    initialSolutionCost = calculateSolutionCost(initialSolution)
+    currentSolution = initialSolution
+    currentCost = initialSolutionCost
     temperature = 100000
     while temperature > 0.1:
-        neighbor = generateRandomIlluminatedRegionSolution()
+        neighbor = swapMutation(currentSolution)
         neighborCost = calculateSolutionCost(neighbor)
-        if neighborCost < currentCost:
+        delta = neighborCost - currentCost
+        if delta < 0:
             currentSolution = neighbor
             currentCost = neighborCost
         else:
-            delta = neighborCost - currentCost
             probability = math.exp(-delta/temperature)
             if random.random() < probability:
                 currentSolution = neighbor
                 currentCost = neighborCost
-        temperature *= 0.99
+        if(initialSolutionCost < currentCost):
+            currentSolution = initialSolution
+            currentCost = initialSolutionCost
+        temperature *= 0.999
     return currentSolution
 
+# simulated annealing solutions
+print(">>> Simulated annealing solutions:")
+
 resultsCost = []
+bestSolution = firstSolution
+bestSolutionCost = calculateSolutionCost(firstSolution)
 for i in range(10):
-    simulatedAnnealingSolution = simulatedAnnealing(firstSolution)
+    simulatedAnnealingSolution = simulatedAnnealing(bestSolution)
+    simulatedAnnealingSolutionCost = calculateSolutionCost(simulatedAnnealingSolution)
     print("[execution:", i+1,"] Simulated-annealing solution: ", simulatedAnnealingSolution)
-    print("[execution:", i+1,"] Cost of simulated-annealing solution: ", calculateSolutionCost(simulatedAnnealingSolution))
+    print("[execution:", i+1,"] Cost of simulated-annealing solution: ", simulatedAnnealingSolutionCost)
     print("[execution:", i+1,"] Is simulated-annealing solution region illuminated? ", isRegionIlluminated(simulatedAnnealingSolution))
-    resultsCost.append(calculateSolutionCost(simulatedAnnealingSolution))
+    resultsCost.append(simulatedAnnealingSolutionCost)
+
+    if simulatedAnnealingSolutionCost < bestSolutionCost:
+        bestSolution = simulatedAnnealingSolution
+        bestSolutionCost = simulatedAnnealingSolutionCost
 
 resultsCostAverage = sum(resultsCost)/len(resultsCost)
 resultsCostStandardDeviation = math.sqrt(sum([(x-resultsCostAverage)**2 for x in resultsCost])/len(resultsCost))
 
 print("Results cost average: ", resultsCostAverage)
 print("Results cost standard deviation: ", resultsCostStandardDeviation)
+print("Best solution: ", bestSolution)
+print("Best solution cost: ", bestSolutionCost)
